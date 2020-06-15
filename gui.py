@@ -292,7 +292,7 @@ class ShowVideoCapture(wx.Panel):
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_TIMER, self.NextFrame)
         
-        replay_icon = wx.Image("icon/video.jpg", wx.BITMAP_TYPE_ANY)
+        replay_icon = wx.Image("icon/replay.jpg", wx.BITMAP_TYPE_ANY)
         replay_icon = replay_icon.Scale(60, 60, wx.IMAGE_QUALITY_HIGH).ConvertToBitmap()
         replay_Btn = wx.BitmapButton(self.parent, -1, replay_icon, pos=(self.width + 180, 340))
         replay_Btn.Bind(wx.EVT_BUTTON, self.replay)
