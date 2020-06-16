@@ -59,9 +59,10 @@ def get_root_relative_poses(inference_results):
     return poses_2d
 
 
-previous_poses_2d = []
-
-
+previous_poses_2d = [Pose(np.ones((Pose.num_kpts, 2), dtype=np.int32) * -1, 1)]
+# pose_keypoints = 
+# pose = Pose(pose_keypoints, pose_2d_scaled[-1])
+# previous_poses_2d.append(pose)
 def parse_poses(inference_results, input_scale, stride, fx, is_video=False):
     global previous_poses_2d
     poses_2d = get_root_relative_poses(inference_results)
@@ -71,19 +72,24 @@ def parse_poses(inference_results, input_scale, stride, fx, is_video=False):
         pose_2d_scaled = np.ones(pose_2d.shape[0], dtype=np.float32) * -1
         for kpt_id in range(num_kpt):
             if pose_2d[kpt_id * 3] != -1:
-                pose_2d_scaled[kpt_id * 3] = pose_2d[kpt_id * 3] * stride / input_scale
-                pose_2d_scaled[kpt_id * 3 + 1] = pose_2d[kpt_id * 3 + 1] * stride / input_scale
-                pose_2d_scaled[kpt_id * 3 + 2] = pose_2d[kpt_id * 3 + 2]
+                if pose_2d[kpt_id * 3] >0 and pose_2d[kpt_id * 3 + 1]>0:
+                    
+                    pose_2d_scaled[kpt_id * 3] = pose_2d[kpt_id * 3] * stride / input_scale
+                    pose_2d_scaled[kpt_id * 3 + 1] = pose_2d[kpt_id * 3 + 1] * stride / input_scale
+                    pose_2d_scaled[kpt_id * 3 + 2] = pose_2d[kpt_id * 3 + 2]
+#                     print(previous_poses_2d)
         pose_2d_scaled[-1] = pose_2d[-1]
         poses_2d_scaled.append(pose_2d_scaled)
 
     if is_video:  # track poses ids
         current_poses_2d = []
-        for pose_2d_scaled in poses_2d_scaled:
+        for pose_2d_scaled,pre_pose in zip(poses_2d_scaled,previous_poses_2d):
             pose_keypoints = np.ones((Pose.num_kpts, 2), dtype=np.int32) * -1
             for kpt_id in range(Pose.num_kpts):
                 if pose_2d_scaled[kpt_id * 3] != -1.0:  # keypoint was found
                     pose_keypoints[kpt_id, 0:2] = pose_2d_scaled[kpt_id * 3:kpt_id * 3 + 2].astype(np.int32)
+                else:
+                    pose_keypoints[kpt_id, 0:2] = pre_pose.keypoints[kpt_id, 0:2].astype(np.int32)
             pose = Pose(pose_keypoints, pose_2d_scaled[-1])
             current_poses_2d.append(pose)
         propagate_ids(previous_poses_2d, current_poses_2d)

@@ -47,6 +47,7 @@ def count_jumpup(poses_2d,up,count):
             count+=1
             #print(count)
         return up,count
+    return up,count
 def count_situp(poses_2d,up,count):
     
     for pose in poses_2d:
@@ -57,6 +58,7 @@ def count_situp(poses_2d,up,count):
         elif (euclidean(pose[0:2,1],pose[0:2,7])>150 and euclidean(pose[0:2,1],pose[0:2,13])>150) and pose[0,12] > 0 and pose[0,13] > 0 and  pose[0,6] > 0 and pose[0,7] > 0 and up==True:
             up=False
         return up,count
+    return up,count
 def count_squat(poses_2d,up,count):
     for pose in poses_2d:
         pose = np.array(pose[0:-1]).reshape((-1, 3)).transpose()
@@ -69,6 +71,7 @@ def count_squat(poses_2d,up,count):
             up=False
 #             print(slop(pose[0:2,6],pose[0:2,7]))
         return up,count
+    return up,count
 def run_video(pathtofile, motion):
     assert motion in ('jumpingjack','situp','squat')
     model = "human-pose-estimation-0001.xml"
